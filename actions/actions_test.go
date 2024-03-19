@@ -1,6 +1,8 @@
 package actions
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestDemo(t *testing.T) {
 	Demo()
