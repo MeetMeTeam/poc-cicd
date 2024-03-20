@@ -6,30 +6,23 @@ name: Go
 on: [push]
 
 jobs:
-
   build:
-    runs-on:
-      - self-hosted
-      - label-1
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
-
-      - name: run one line script
-        run: |
-          echo Hello, world!
-          sleep 15
-          echo Bye!
 
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: '1.15'
 
-      - name: Build
-        run: go build -v ./...
-
-      - name: Test
-        run: go test -v ./...
+      - name: Docker Build and Push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: winnerkypt/poc-cicd:latest
 
   deploy:
     runs-on:
@@ -46,4 +39,6 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker rm hhh || true
+            docker pull winnerkypt/poc-cicd:latest
+            docker rm -f poc || true
+            docker run -d --name poc -p 8080:8080 winnerkypt/poc-cicd:latest
