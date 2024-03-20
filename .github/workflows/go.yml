@@ -7,9 +7,17 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: 
+      - self-hosted
+      - label-1
     steps:
     - uses: actions/checkout@v3
+
+    - name: run one line script
+      run: |
+        echo Hello, world!
+        sleep 15
+        echo Bye!
 
     - name: Set up Go
       uses: actions/setup-go@v3
