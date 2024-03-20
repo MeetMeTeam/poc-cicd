@@ -6,26 +6,67 @@ name: Go
 on: [push]
 
 jobs:
+#  build:
+#    runs-on: self-hosted
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set up Go
+#        uses: actions/setup-go@v3
+#        with:
+#          go-version: '1.15'
+#
+#      - name: Build
+#        run: go build -o app .
+#
+#      - name: Docker Build and Push
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          file: Dockerfile
+#          push: true
+#          tags: your-docker-username/your-repo-name:latest
+
   build:
-    runs-on: 
+    runs-on:
       - self-hosted
       - label-1
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: run one line script
-      run: |
-        echo Hello, world!
-        sleep 15
-        echo Bye!
+      - name: run one line script
+        run: |
+          echo Hello, world!
+          sleep 15
+          echo Bye!
 
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: '1.15'
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.15'
 
-    - name: Build
-      run: go build -v ./...
+      - name: Build
+        run: go build -v ./...
 
-    - name: Test
-      run: go test -v ./...
+      - name: Test
+        run: go test -v ./...
+
+  deploy:
+    runs-on:
+      - self-hosted
+      - label-1
+
+    needs: build
+
+    steps:
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+#            docker pull your-docker-username/your-repo-name:latest
+#            docker stop your-container-name || true
+            docker rm hhh || true
+#            docker run -d --name your-container-name -p 8080:8080 your-docker-username/your-repo-name:latest
